@@ -1,11 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[DefaultExecutionOrder(-1)]
 public class InputHandler : MonoBehaviour
 {
     public InputMaster input;
+
+    public delegate void StartTouchEvent(Vector2 position);
+    public event StartTouchEvent OnStartTouch;
+    public delegate void EndTouchEvent(Vector2 position);
+    public event EndTouchEvent OnEndTouch;
 
     private void OnEnable()
     {
@@ -19,27 +26,21 @@ public class InputHandler : MonoBehaviour
 
     private void Awake()
     {
+        // Subscribing to the input functions
         input = new InputMaster();
-        input.Player.Move.performed += ctx => Move(ctx.ReadValue<Vector2>());
+        input.Player.TouchPress.started += ctx => StartTouch(ctx);
+        input.Player.TouchPress.canceled += ctx => EndTouch(ctx);
     }
 
-    public void Move(Vector2 direction)
+    private void StartTouch(InputAction.CallbackContext context)
     {
-        if (direction.x > 0)
-        {
-            Debug.Log("Attempting to rotate right!");
+        Debug.Log("Touch Started");
+        if (OnStartTouch != null) OnStartTouch(input.Player.Move.ReadValue<Vector2>());
+    }
 
-        } else if (direction.x < 0)
-        {
-            Debug.Log("Attempting to rotate left!");
-
-        } else if (direction.y > 0)
-        {
-            Debug.Log("Attempting to go up!");
-
-        } else if (direction.y < 0)
-        {
-            Debug.Log("Attempting to go down!");
-        }
+    private void EndTouch(InputAction.CallbackContext context)
+    {
+        Debug.Log("Touch Ended");
+        if (OnEndTouch != null) OnEndTouch(input.Player.Move.ReadValue<Vector2>());
     }
 }

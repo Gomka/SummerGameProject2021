@@ -1,5 +1,5 @@
 {
-    "name": "SummerProject",
+    "name": "InputMaster",
     "maps": [
         {
             "name": "Player",
@@ -7,11 +7,19 @@
             "actions": [
                 {
                     "name": "Move",
-                    "type": "Value",
+                    "type": "PassThrough",
                     "id": "5a9e0650-ea20-4620-9e3c-3ca8ebc50b29",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "Press"
+                },
+                {
+                    "name": "TouchPress",
+                    "type": "Button",
+                    "id": "41466198-6fa5-4738-8082-defcb1050e81",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(behavior=2)"
                 }
             ],
             "bindings": [
@@ -113,6 +121,28 @@
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "53df21a4-6630-44de-ad65-c811ab75c703",
+                    "path": "<Touchscreen>/primaryTouch/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touch",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "477fec57-247d-4841-bfb4-ce4d1b71f5a1",
+                    "path": "<Touchscreen>/primaryTouch/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touch",
+                    "action": "TouchPress",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
