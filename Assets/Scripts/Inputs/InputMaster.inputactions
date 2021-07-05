@@ -11,11 +11,11 @@
                     "id": "5a9e0650-ea20-4620-9e3c-3ca8ebc50b29",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": "Press"
+                    "interactions": ""
                 },
                 {
                     "name": "TouchPress",
-                    "type": "Button",
+                    "type": "PassThrough",
                     "id": "41466198-6fa5-4738-8082-defcb1050e81",
                     "expectedControlType": "Button",
                     "processors": "",

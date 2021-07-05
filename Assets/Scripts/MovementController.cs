@@ -5,46 +5,79 @@ using UnityEngine;
 public class MovementController : MonoBehaviour
 {
     [SerializeField] private InputHandler input;
-    private Camera cameraMain;
-    private void Awake()
-    {
-        cameraMain = Camera.main;   
-    }
+
+    [SerializeField] float minSwipeDistance = 0.2f;
+    [SerializeField] float maxSwipeTime = 1f;
+
+    private Vector2 startPos, endPos;
+    private float startTime, endTime, incrementX, incrementY;
+    private bool screenTapped = false;
 
     private void OnEnable()
     {
-        input.OnStartTouch += Move;
+        input.OnStartTouch += SwipeStart;
+        input.OnEndTouch += SwipeEnd;
     }
 
     private void OnDisable()
     {
-        input.OnStartTouch -= Move;
+        input.OnStartTouch -= SwipeStart;
+        input.OnEndTouch += SwipeEnd;
     }
 
-    private void Move(Vector2 coords)
+    private void SwipeStart(Vector2 coords, float time)
     {
-        Vector3 screenCoordinates = new Vector3(coords.x, coords.y, cameraMain.nearClipPlane);
-        Vector3 worldCoordinates = cameraMain.ScreenToWorldPoint(screenCoordinates);
-        worldCoordinates.z = 0;
+        startPos = coords;
+        startTime = time;
+    }
 
-        if (worldCoordinates.y > 2.5)
+    private void SwipeEnd(Vector2 coords, float time)
+    {
+        endPos = coords;
+        endTime = time;
+        Move();
+    }
+
+    private void Move()
+    {
+        if(Vector3.Distance(startPos, endPos) >= minSwipeDistance && (endTime - startTime) <= maxSwipeTime )
         {
-            Debug.Log("Attempting to go up! " + worldCoordinates);
+            Debug.DrawLine(startPos, endPos, Color.red, 1f);
 
+            incrementY = endPos.y - startPos.y;
+            incrementX = endPos.x - startPos.x;
+            screenTapped = false;
+
+        } else
+        {
+            incrementX = endPos.x;
+            incrementY = endPos.y;
+            screenTapped = true;
         }
-        else if (worldCoordinates.y < -2.5)
-        {
-            Debug.Log("Attempting to go down! " + worldCoordinates);
-        }
-        else if (worldCoordinates.x > 0)
-        {
-            Debug.Log("Attempting to rotate right! " + worldCoordinates);
 
-        }
-        else if (worldCoordinates.x < 0)
+        if (Mathf.Abs(incrementX) > Mathf.Abs(incrementY) || screenTapped)
         {
-            Debug.Log("Attempting to rotate left! " + worldCoordinates);
+            if (incrementX > 0)
+            {
+                Debug.Log("Attempting to rotate right!");
 
+            }
+            else
+            {
+                Debug.Log("Attempting to rotate left!");
+            }
+        }
+        else
+        {
+            if (incrementY > 0)
+            {
+                Debug.Log("Attempting to go up!");
+
+            }
+            else
+            {
+                Debug.Log("Attempting to go down!");
+            }
         }
     }
 }
