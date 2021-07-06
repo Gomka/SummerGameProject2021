@@ -38,13 +38,11 @@ public class InputHandler : MonoBehaviour
 
     private void StartTouch(InputAction.CallbackContext context)
     {
-        Debug.Log("Touch Started");
         if (OnStartTouch != null) OnStartTouch(ScreenToWorld(input.Player.Move.ReadValue<Vector2>()), (float) context.startTime);
     }
 
     private void EndTouch(InputAction.CallbackContext context)
     {
-        Debug.Log("Touch Ended");
         if (OnEndTouch != null) OnEndTouch(ScreenToWorld(input.Player.Move.ReadValue<Vector2>()), (float) context.time);
     }
 
