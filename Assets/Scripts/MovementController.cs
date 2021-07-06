@@ -6,12 +6,14 @@ public class MovementController : MonoBehaviour
 {
     [SerializeField] private InputHandler input;
 
-    [SerializeField] float minSwipeDistance = 0.2f;
-    [SerializeField] float maxSwipeTime = 1f;
+    [SerializeField] private float minSwipeDistance = 0.2f;
+    [SerializeField] private float maxSwipeTime = 1f;
+    [SerializeField] private float rotationTime = 0.5f;
+    [SerializeField] private int numSegments = 4;
 
     private Vector2 startPos, endPos;
-    private float startTime, endTime, incrementX, incrementY;
-    private bool screenTapped = false;
+    private float startTime, endTime, incrementX, incrementY, rotationAngle;
+    private bool isMoving = false, screenTapped = false;
 
     private void OnEnable()
     {
@@ -23,6 +25,11 @@ public class MovementController : MonoBehaviour
     {
         input.OnStartTouch -= SwipeStart;
         input.OnEndTouch += SwipeEnd;
+    }
+
+    private void Start()
+    {
+        rotationAngle = 360.0f / numSegments;
     }
 
     private void SwipeStart(Vector2 coords, float time)
@@ -59,12 +66,11 @@ public class MovementController : MonoBehaviour
         {
             if (incrementX > 0)
             {
-                Debug.Log("Attempting to rotate right!");
-
+                if (!isMoving) StartCoroutine(Rotate(true));
             }
             else
             {
-                Debug.Log("Attempting to rotate left!");
+                if (!isMoving) StartCoroutine(Rotate(false));
             }
         }
         else
@@ -72,7 +78,6 @@ public class MovementController : MonoBehaviour
             if (incrementY > 0)
             {
                 Debug.Log("Attempting to go up!");
-
             }
             else
             {
@@ -80,4 +85,39 @@ public class MovementController : MonoBehaviour
             }
         }
     }
+
+    IEnumerator Rotate(bool rotatingRight)
+    {
+        isMoving = true;
+
+        Vector3 eulerRotation = transform.rotation.eulerAngles;
+
+        float t = 0.0f;
+
+        while (t < rotationTime)
+        {
+            t += Time.deltaTime;
+            if (!rotatingRight)
+            {
+                transform.Rotate(0.0f, 0.0f, rotationAngle * Time.deltaTime * 2);
+            } else
+            {
+                transform.Rotate(0.0f, 0.0f, rotationAngle * Time.deltaTime * -2);
+            }
+
+            yield return null;
+        }
+
+        if (!rotatingRight)
+        {
+            transform.rotation = Quaternion.Euler(eulerRotation.x, eulerRotation.y, eulerRotation.z + rotationAngle);
+        } else
+        {
+            transform.rotation = Quaternion.Euler(eulerRotation.x, eulerRotation.y, eulerRotation.z - rotationAngle);
+        }
+
+        if (t >= rotationTime) isMoving = false;
+
+    }
+    
 }
