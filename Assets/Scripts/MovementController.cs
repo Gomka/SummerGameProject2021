@@ -11,6 +11,10 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float rotationTime = 0.5f;
     [SerializeField] private int numSegments = 4;
 
+    [SerializeField] private Platform[] platformsInterior, platformsExterior;
+
+    private Platform[][] platforms;
+    private int currentPlatformIndex = 0, currentHeight = 0;
     private Vector2 startPos, endPos;
     private float startTime, endTime, incrementX, incrementY, rotationAngle;
     private bool isMoving = false, screenTapped = false;
@@ -30,6 +34,10 @@ public class MovementController : MonoBehaviour
     private void Start()
     {
         rotationAngle = 360.0f / numSegments;
+
+        platforms = new Platform[2][];
+        platforms[0] = platformsInterior;
+        platforms[1] = platformsExterior;
     }
 
     private void SwipeStart(Vector2 coords, float time)
@@ -62,25 +70,40 @@ public class MovementController : MonoBehaviour
             screenTapped = true;
         }
 
-        if (Mathf.Abs(incrementX) > Mathf.Abs(incrementY) || screenTapped)
+        if ((Mathf.Abs(incrementX) > Mathf.Abs(incrementY) || screenTapped) && !isMoving)
         {
             if (incrementX > 0)
             {
-                if (!isMoving) StartCoroutine(Rotate(true));
+                // Rotating to the right
+
+                if (canRotate(true))
+                {
+                    StartCoroutine(Rotate(true));
+
+                }
+
             }
             else
             {
-                if (!isMoving) StartCoroutine(Rotate(false));
+                // Rotating to the left
+
+                if (canRotate(false))
+                {
+                    StartCoroutine(Rotate(false));
+
+                }
             }
         }
         else
         {
             if (incrementY > 0)
             {
+                // Going up
                 Debug.Log("Attempting to go up!");
             }
             else
-            {
+            { 
+                // Going down
                 Debug.Log("Attempting to go down!");
             }
         }
@@ -108,7 +131,7 @@ public class MovementController : MonoBehaviour
             yield return null;
         }
 
-        if (!rotatingRight)
+        if (!rotatingRight) // Rotation ends
         {
             transform.rotation = Quaternion.Euler(eulerRotation.x, eulerRotation.y, eulerRotation.z + rotationAngle);
         } else
@@ -116,8 +139,44 @@ public class MovementController : MonoBehaviour
             transform.rotation = Quaternion.Euler(eulerRotation.x, eulerRotation.y, eulerRotation.z - rotationAngle);
         }
 
-        if (t >= rotationTime) isMoving = false;
+        isMoving = false;
+
+        damageCurrentPlatform();
 
     }
-    
+
+    public bool canRotate(bool rotatingRight)
+    {
+        int previousPosition = currentPlatformIndex;
+
+        if (rotatingRight)
+        {
+            currentPlatformIndex++;
+
+            if (currentPlatformIndex > platforms[currentHeight].Length -1) currentPlatformIndex = 0;
+
+        } else
+        {
+            currentPlatformIndex--;
+
+            if (currentPlatformIndex < 0) currentPlatformIndex = platforms[currentHeight].Length -1;
+        }
+
+        if (!platforms[currentHeight][currentPlatformIndex].IsWalkable())
+        {
+            currentPlatformIndex = previousPosition;
+            return false;
+        }
+
+        return true;
+    }
+
+    public void damageCurrentPlatform()
+    {
+        Debug.Log(currentPlatformIndex);
+
+        platforms[currentHeight][currentPlatformIndex].reduceDurability();
+
+        //if(platforms[currentPlatformIndex].isBroken()) // Player dies
+    }
 }
