@@ -8,15 +8,18 @@ public class MovementController : MonoBehaviour
 
     [SerializeField] private float minSwipeDistance = 0.2f;
     [SerializeField] private float maxSwipeTime = 1f;
-    [SerializeField] private float rotationTime = 0.5f;
+    [SerializeField] private float rotationTime = 0.5f, heightChangeTime = 0.25f;
     [SerializeField] private int numSegments = 4;
 
     [SerializeField] private Platform[] platformsInterior, platformsExterior;
 
+    [SerializeField] private GameObject player;
+    [SerializeField] private Transform lowerPos, higherPos;
+
     private Platform[][] platforms;
     private int currentPlatformIndex = 0, currentHeight = 0;
     private Vector2 startPos, endPos;
-    private float startTime, endTime, incrementX, incrementY, rotationAngle;
+    private float startTime, endTime, incrementX, incrementY, rotationAngle, rotationSpeed;
     private bool isMoving = false, screenTapped = false;
 
     private void OnEnable()
@@ -34,6 +37,7 @@ public class MovementController : MonoBehaviour
     private void Start()
     {
         rotationAngle = 360.0f / numSegments;
+        rotationSpeed = 1 / rotationTime;
 
         platforms = new Platform[2][];
         platforms[0] = platformsInterior;
@@ -99,12 +103,20 @@ public class MovementController : MonoBehaviour
             if (incrementY > 0)
             {
                 // Going up
-                Debug.Log("Attempting to go up!");
+
+                if(canChangeHeight(true))
+                {
+                    StartCoroutine(changeHeight(true));
+                }
             }
             else
-            { 
+            {
                 // Going down
-                Debug.Log("Attempting to go down!");
+
+                if (canChangeHeight(false))
+                {
+                    StartCoroutine(changeHeight(false));
+                }
             }
         }
     }
@@ -117,15 +129,15 @@ public class MovementController : MonoBehaviour
 
         float t = 0.0f;
 
-        while (t < rotationTime)
+        while (t < 1)
         {
-            t += Time.deltaTime;
+            t += Time.deltaTime / rotationTime;
             if (!rotatingRight)
             {
-                transform.Rotate(0.0f, 0.0f, rotationAngle * Time.deltaTime * 2);
+                transform.Rotate(0.0f, 0.0f, rotationAngle * Time.deltaTime * rotationSpeed);
             } else
             {
-                transform.Rotate(0.0f, 0.0f, rotationAngle * Time.deltaTime * -2);
+                transform.Rotate(0.0f, 0.0f, rotationAngle * Time.deltaTime * rotationSpeed * -1);
             }
 
             yield return null;
@@ -145,7 +157,41 @@ public class MovementController : MonoBehaviour
 
     }
 
-    public bool canRotate(bool rotatingRight)
+    IEnumerator changeHeight(bool goingUp)
+    {
+        isMoving = true;
+
+        Vector3 currentPos, finalPos;
+        
+        if(goingUp)
+        {
+            currentPos = lowerPos.position;
+            finalPos = higherPos.position;
+            currentHeight = 1;
+
+        } else
+        {
+            currentPos = higherPos.position;
+            finalPos = lowerPos.position;
+            currentHeight = 0;
+        }
+
+
+        float t = 0f;
+        while (t < 1)
+        {
+            t += Time.deltaTime / heightChangeTime;
+            player.transform.position = Vector3.Lerp(currentPos, finalPos, t);
+            yield return null;
+        }
+
+        isMoving = false;
+
+        damageCurrentPlatform();
+
+    }
+
+    private bool canRotate(bool rotatingRight)
     {
         int previousPosition = currentPlatformIndex;
 
@@ -171,10 +217,20 @@ public class MovementController : MonoBehaviour
         return true;
     }
 
-    public void damageCurrentPlatform()
+    private bool canChangeHeight(bool goingUp)
     {
-        Debug.Log(currentPlatformIndex);
+        if ((currentHeight == 1 && goingUp) || (currentHeight == 0 && !goingUp)) return false;
 
+        if((goingUp && !platforms[1][currentPlatformIndex].IsWalkable()) || (!goingUp && !platforms[0][currentPlatformIndex].IsWalkable()))
+        {
+            return false;
+        } 
+
+        return true;
+    }
+
+    private void damageCurrentPlatform()
+    {
         platforms[currentHeight][currentPlatformIndex].reduceDurability();
 
         //if(platforms[currentPlatformIndex].isBroken()) // Player dies
