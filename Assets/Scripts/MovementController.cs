@@ -85,7 +85,6 @@ public class MovementController : MonoBehaviour
                     StartCoroutine(Rotate(true));
 
                 }
-
             }
             else
             {
@@ -129,9 +128,10 @@ public class MovementController : MonoBehaviour
 
         float t = 0.0f;
 
-        while (t < 1)
+        while (t < rotationTime)
         {
-            t += Time.deltaTime / rotationTime;
+            t += Time.deltaTime;
+
             if (!rotatingRight)
             {
                 transform.Rotate(0.0f, 0.0f, rotationAngle * Time.deltaTime * rotationSpeed);
@@ -176,8 +176,8 @@ public class MovementController : MonoBehaviour
             currentHeight = 0;
         }
 
-
         float t = 0f;
+
         while (t < 1)
         {
             t += Time.deltaTime / heightChangeTime;
@@ -231,8 +231,17 @@ public class MovementController : MonoBehaviour
 
     private void damageCurrentPlatform()
     {
+        if (platforms[currentHeight][currentPlatformIndex].isBroken()) Debug.Log("Game over");
+
         platforms[currentHeight][currentPlatformIndex].reduceDurability();
 
-        //if(platforms[currentPlatformIndex].isBroken()) // Player dies
+        foreach(Platform[] plats in platforms) {
+            foreach(Platform p in plats)
+            {
+                if (!p.isBroken()) return;
+            }
+        }
+
+        Debug.Log("Game won");
     }
 }

@@ -34,7 +34,7 @@ public class Platform : MonoBehaviour
 
     public bool isBroken()
     {
-        return durability > 0;
+        return durability <= 0;
     }
 
     public bool IsWalkable()
