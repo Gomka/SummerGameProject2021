@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MovementController : MonoBehaviour
@@ -21,6 +20,11 @@ public class MovementController : MonoBehaviour
     private Vector2 startPos, endPos;
     private float startTime, endTime, incrementX, incrementY, rotationAngle, rotationSpeed;
     private bool isMoving = false, screenTapped = false;
+
+    public delegate void RestartLevelEvent();
+    public event RestartLevelEvent RestartLevel;
+    public delegate void NextLevelEvent();
+    public event NextLevelEvent NextLevel;
 
     private void OnEnable()
     {
@@ -231,7 +235,10 @@ public class MovementController : MonoBehaviour
 
     private void damageCurrentPlatform()
     {
-        if (platforms[currentHeight][currentPlatformIndex].isBroken()) Debug.Log("Game over");
+        if (platforms[currentHeight][currentPlatformIndex].isBroken()) 
+        {
+            if (RestartLevel != null) RestartLevel();
+        }
 
         platforms[currentHeight][currentPlatformIndex].reduceDurability();
 
@@ -242,6 +249,6 @@ public class MovementController : MonoBehaviour
             }
         }
 
-        Debug.Log("Game won");
+        if (NextLevel != null) NextLevel();
     }
 }
