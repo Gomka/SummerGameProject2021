@@ -19,7 +19,7 @@ public class MovementController : MonoBehaviour
     private int currentPlatformIndex = 0, currentHeight = 0;
     private Vector2 startPos, endPos;
     private float startTime, endTime, incrementX, incrementY, rotationAngle, rotationSpeed;
-    private bool isMoving = false, screenTapped = false;
+    private bool isMoving = false;
 
     public delegate void RestartLevelEvent();
     public event RestartLevelEvent RestartLevel;
@@ -58,27 +58,23 @@ public class MovementController : MonoBehaviour
     {
         endPos = coords;
         endTime = time;
-        Move();
+        if(!isMoving) Move();
     }
 
     private void Move()
     {
         if(Vector3.Distance(startPos, endPos) >= minSwipeDistance && (endTime - startTime) <= maxSwipeTime )
         {
-            Debug.DrawLine(startPos, endPos, Color.red, 1f);
-
-            incrementY = endPos.y - startPos.y;
             incrementX = endPos.x - startPos.x;
-            screenTapped = false;
+            incrementY = endPos.y - startPos.y;
 
         } else
         {
-            incrementX = endPos.x;
-            incrementY = endPos.y;
-            screenTapped = true;
+            incrementX = endPos.x * -1;
+            incrementY = 0;
         }
 
-        if ((Mathf.Abs(incrementX) > Mathf.Abs(incrementY) || screenTapped) && !isMoving)
+        if (Mathf.Abs(incrementX) > Mathf.Abs(incrementY))
         {
             if (incrementX > 0)
             {
@@ -238,6 +234,8 @@ public class MovementController : MonoBehaviour
         if (platforms[currentHeight][currentPlatformIndex].isBroken()) 
         {
             if (RestartLevel != null) RestartLevel();
+
+            isMoving = true;
         }
 
         platforms[currentHeight][currentPlatformIndex].reduceDurability();
