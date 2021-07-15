@@ -3,7 +3,7 @@ using UnityEngine;
 public class Platform : MonoBehaviour
 {
     [SerializeField] private int durability = 1;
-    [SerializeField] private bool isWalkable = true;
+    [SerializeField] private bool isWalkable = true, canChangeHeight = true;
     [SerializeField] private Sprite defaultSprite, brokenSprite;
 
     private SpriteRenderer spriteRenderer;
@@ -32,12 +32,19 @@ public class Platform : MonoBehaviour
 
     public bool isBroken()
     {
+        if (!isWalkable) return true;
+
         return durability <= 0;
     }
 
     public bool IsWalkable()
     {
         return isWalkable;
+    }
+
+    public bool getCanChangeHeight()
+    {
+        return canChangeHeight;
     }
 
     private Sprite getSpriteFromDurability()

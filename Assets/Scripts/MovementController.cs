@@ -8,7 +8,6 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float minSwipeDistance = 0.2f;
     [SerializeField] private float maxSwipeTime = 1f;
     [SerializeField] private float rotationTime = 0.5f, heightChangeTime = 0.25f;
-    [SerializeField] private int numSegments = 4;
 
     [SerializeField] private Platform[] platformsInterior, platformsExterior;
 
@@ -18,7 +17,7 @@ public class MovementController : MonoBehaviour
     private Platform[][] platforms;
     private int currentPlatformIndex = 0, currentHeight = 0;
     private Vector2 startPos, endPos;
-    private float startTime, endTime, incrementX, incrementY, rotationAngle, rotationSpeed;
+    private float startTime, endTime, incrementX, incrementY, rotationAngle = 0, rotationSpeed;
     private bool isMoving = false;
 
     public delegate void RestartLevelEvent();
@@ -40,12 +39,18 @@ public class MovementController : MonoBehaviour
 
     private void Start()
     {
-        rotationAngle = 360.0f / numSegments;
         rotationSpeed = 1 / rotationTime;
 
         platforms = new Platform[2][];
         platforms[0] = platformsInterior;
         platforms[1] = platformsExterior;
+
+        setCurrentRotatingAngle();
+    }
+
+    private void setCurrentRotatingAngle()
+    {
+        this.rotationAngle = 360.0f / platforms[currentHeight].Length;
     }
 
     private void SwipeStart(Vector2 coords, float time)
@@ -125,6 +130,8 @@ public class MovementController : MonoBehaviour
         isMoving = true;
 
         Vector3 eulerRotation = transform.rotation.eulerAngles;
+
+        setCurrentRotatingAngle();
 
         float t = 0.0f;
 
@@ -219,7 +226,7 @@ public class MovementController : MonoBehaviour
 
     private bool canChangeHeight(bool goingUp)
     {
-        if ((currentHeight == 1 && goingUp) || (currentHeight == 0 && !goingUp)) return false;
+        if ((currentHeight == 1 && goingUp) || (currentHeight == 0 && !goingUp) || platforms[1].Length == 0 || platforms[0].Length == 0 || platforms[currentHeight][currentPlatformIndex].getCanChangeHeight() == false) return false;
 
         if((goingUp && !platforms[1][currentPlatformIndex].IsWalkable()) || (!goingUp && !platforms[0][currentPlatformIndex].IsWalkable()))
         {
