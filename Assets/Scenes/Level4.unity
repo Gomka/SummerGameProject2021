@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731713, g: 0.13414736, b: 0.12107852, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1021,7 +1021,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   durability: 1
   isWalkable: 1
-  canChangeHeight: 1
+  canChangeHeight: 0
   defaultSprite: {fileID: 21300000, guid: aad945c2165c4ef45bf4bb142a38c29f, type: 3}
   brokenSprite: {fileID: 21300000, guid: ee4a73fb331684a4fb1bab32a6fa73c4, type: 3}
 --- !u!114 &7244140410774703795
@@ -1038,7 +1038,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   durability: 1
   isWalkable: 1
-  canChangeHeight: 1
+  canChangeHeight: 0
   defaultSprite: {fileID: 21300000, guid: aad945c2165c4ef45bf4bb142a38c29f, type: 3}
   brokenSprite: {fileID: 21300000, guid: ee4a73fb331684a4fb1bab32a6fa73c4, type: 3}
 --- !u!212 &7244140410774703796
@@ -1238,7 +1238,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   durability: 1
   isWalkable: 1
-  canChangeHeight: 1
+  canChangeHeight: 0
   defaultSprite: {fileID: 21300000, guid: aad945c2165c4ef45bf4bb142a38c29f, type: 3}
   brokenSprite: {fileID: 21300000, guid: ee4a73fb331684a4fb1bab32a6fa73c4, type: 3}
 --- !u!1 &7244140411184467477
